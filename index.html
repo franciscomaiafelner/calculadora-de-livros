@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Leitura</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #8b5cf6;
+            --primary-hover: #7c3aed;
+            --accent: #06b6d4;
+            --danger: #ef4444;
+            --success: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+                radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+                radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.6s ease-out;
+            position: relative;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 30px;
+            background: linear-gradient(to right, #a78bfa, #22d3ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+            transition: opacity 0.3s ease;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 16px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 1.1rem;
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2), inset 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .timer-display {
+            font-size: 4.5rem;
+            font-weight: 800;
+            text-align: center;
+            margin: 30px 0;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -2px;
+            text-shadow: 0 0 30px rgba(139, 92, 246, 0.4);
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            box-shadow: 0 10px 20px -10px var(--primary);
+        }
+
+        .btn-start:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 25px -10px var(--primary);
+        }
+
+        .btn-stop {
+            background: linear-gradient(135deg, #ef4444, #f97316);
+            color: white;
+            box-shadow: 0 10px 20px -10px var(--danger);
+            display: none;
+            animation: pulseFade 2s infinite;
+        }
+        
+        @keyframes pulseFade {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        .btn-stop:hover {
+            transform: translateY(-2px);
+            animation: none;
+            box-shadow: 0 15px 25px -10px var(--danger);
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 25px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 16px;
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+            box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.2);
+        }
+
+        .result p {
+            margin-bottom: 12px;
+            line-height: 1.5;
+            color: var(--text-color);
+            font-size: 1.05rem;
+        }
+
+        .result .highlight {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--success);
+            display: block;
+            margin-top: 15px;
+            background: linear-gradient(to right, #34d399, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .error-msg {
+            color: #f87171;
+            font-size: 0.85rem;
+            margin-top: 8px;
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Tempo de Leitura</h1>
+        
+        <div class="input-group">
+            <label for="pagesLeft">Quantas páginas faltam para acabar o livro?</label>
+            <input type="number" id="pagesLeft" min="1" placeholder="Ex: 150">
+            <div class="error-msg" id="error-msg">Por favor, insira um número válido de páginas (>0).</div>
+        </div>
+
+        <div class="input-group">
+            <label for="hoursPerDay">Quantas horas lê por dia?</label>
+            <input type="number" id="hoursPerDay" min="0.1" step="0.1" placeholder="Ex: 1.5">
+            <div class="error-msg" id="hours-error-msg">Por favor, insira um número válido de horas (>0).</div>
+        </div>
+
+        <div class="timer-display" id="timer">00:00</div>
+
+        <button class="btn-start" id="startBtn">Iniciar leitura de 1 página</button>
+        <button class="btn-stop" id="stopBtn">Terminei a página</button>
+
+        <div class="result" id="resultBlock">
+            <p>Tempo desta página: <strong id="pageTimeResult">0s</strong></p>
+            <p>Páginas restantes a partir de agora: <strong id="pagesLeftResult">0</strong></p>
+            <span class="highlight" id="totalTimeResult">0h 0m</span>
+            <p style="margin-top: 15px; font-size: 1.05rem;">Dias restantes: <strong id="daysLeftResult" style="color: var(--accent);">0</strong></p>
+            <p style="font-size: 1.05rem;">Data de conclusão: <strong id="finishDateResult" style="color: var(--accent);">-</strong></p>
+        </div>
+    </div>
+
+    <script>
+        let timerInterval;
+        let startTime;
+        let elapsedTime = 0;
+        let isRunning = false;
+
+        const pagesInput = document.getElementById('pagesLeft');
+        const errorMsg = document.getElementById('error-msg');
+        const hoursInput = document.getElementById('hoursPerDay');
+        const hoursErrorMsg = document.getElementById('hours-error-msg');
+        const timerDisplay = document.getElementById('timer');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const resultBlock = document.getElementById('resultBlock');
+        const pageTimeResult = document.getElementById('pageTimeResult');
+        const pagesLeftResult = document.getElementById('pagesLeftResult');
+        const totalTimeResult = document.getElementById('totalTimeResult');
+        const daysLeftResult = document.getElementById('daysLeftResult');
+        const finishDateResult = document.getElementById('finishDateResult');
+        const inputGroups = document.querySelectorAll('.input-group');
+
+        function formatTime(ms) {
+            const totalSeconds = Math.floor(ms / 1000);
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function formatDuration(totalSeconds) {
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            
+            let parts = [];
+            if (hours > 0) parts.push(`${hours}h`);
+            if (minutes > 0) parts.push(`${minutes}m`);
+            if (seconds > 0 || parts.length === 0) parts.push(`${seconds}s`);
+            
+            return parts.join(' ');
+        }
+
+        startBtn.addEventListener('click', () => {
+            const pages = parseInt(pagesInput.value);
+            const hours = parseFloat(hoursInput.value);
+            
+            let hasError = false;
+            
+            if (isNaN(pages) || pages <= 0) {
+                errorMsg.style.display = 'block';
+                hasError = true;
+            } else {
+                errorMsg.style.display = 'none';
+            }
+            
+            if (isNaN(hours) || hours <= 0) {
+                hoursErrorMsg.style.display = 'block';
+                hasError = true;
+            } else {
+                hoursErrorMsg.style.display = 'none';
+            }
+            
+            if (hasError) return;
+            
+            resultBlock.style.display = 'none';
+            
+            // UI States during running
+            inputGroups.forEach(group => {
+                group.style.opacity = '0.5';
+                group.style.pointerEvents = 'none';
+            });
+            pagesInput.disabled = true;
+            hoursInput.disabled = true;
+
+            isRunning = true;
+            startTime = Date.now();
+            
+            startBtn.style.display = 'none';
+            stopBtn.style.display = 'block';
+
+            timerInterval = setInterval(() => {
+                elapsedTime = Date.now() - startTime;
+                timerDisplay.textContent = formatTime(elapsedTime);
+            }, 100);
+        });
+
+        stopBtn.addEventListener('click', () => {
+            if (!isRunning) return;
+            
+            clearInterval(timerInterval);
+            isRunning = false;
+            
+            startBtn.style.display = 'block';
+            startBtn.textContent = 'Ler próxima página';
+            stopBtn.style.display = 'none';
+            
+            // Re-enable input
+            inputGroups.forEach(group => {
+                group.style.opacity = '1';
+                group.style.pointerEvents = 'auto';
+            });
+            pagesInput.disabled = false;
+            hoursInput.disabled = false;
+
+            const pages = parseInt(pagesInput.value);
+            const hours = parseFloat(hoursInput.value);
+            // Protect against zero time (e.g., clicking too fast)
+            const timeInSecondsForOnePage = Math.max(1, Math.floor(elapsedTime / 1000));
+            
+            // Subtract the page we just read
+            const remainingPages = Math.max(0, pages - 1);
+            pagesInput.value = remainingPages; // update input for the next round
+            
+            const totalEstimatedSeconds = timeInSecondsForOnePage * remainingPages;
+
+            pageTimeResult.textContent = formatDuration(timeInSecondsForOnePage);
+            pagesLeftResult.textContent = remainingPages;
+            
+            const hoursPerDaySeconds = hours * 3600;
+            const daysLeft = totalEstimatedSeconds / hoursPerDaySeconds;
+            
+            if (remainingPages === 0) {
+                totalTimeResult.textContent = "Parabéns, terminou o livro!";
+                daysLeftResult.parentElement.style.display = 'none';
+                finishDateResult.parentElement.style.display = 'none';
+            } else {
+                totalTimeResult.innerHTML = `Tempo Restante Estimado:<br/>${formatDuration(totalEstimatedSeconds)}`;
+                daysLeftResult.parentElement.style.display = 'block';
+                finishDateResult.parentElement.style.display = 'block';
+                
+                const roundedDays = Math.ceil(daysLeft);
+                
+                if (daysLeft < 1) {
+                    daysLeftResult.textContent = 'Menos de 1 dia';
+                } else {
+                    daysLeftResult.textContent = roundedDays + (roundedDays === 1 ? ' dia' : ' dias');
+                }
+                
+                const finishDate = new Date();
+                finishDate.setDate(finishDate.getDate() + roundedDays);
+                
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                finishDateResult.textContent = finishDate.toLocaleDateString('pt-BR', options);
+            }
+
+            resultBlock.style.display = 'block';
+            elapsedTime = 0;
+            timerDisplay.textContent = '00:00';
+        });
+    </script>
+</body>
+</html>
